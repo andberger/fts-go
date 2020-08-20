@@ -98,20 +98,23 @@ func (idx index) add(docs []document) {
     }
 }
 
-func (idx index) persist() {
+func (idx index) saveIndex() {
 
 }
 
-func loadIndex() {
-    return
+func (idx index) loadIndex() {
+
 }
 
 func createInvertedIndexIfNotExists() {
+    idx := make(index)
+    if err := loadIndex("./index.json", idx); err != nil {
+        log.Fatalln(err)
+    }
     docs, err := loadDocuments(`enwiki-latest-abstract1.xml`)
     if err != nil {
         fmt.Println("Error when loading documents: ", err)
     }
-    idx := make(index)
     idx.add(docs)
     idx.persist()
 }
