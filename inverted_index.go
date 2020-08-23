@@ -4,8 +4,10 @@ import (
     "fmt"
     "encoding/xml"
     "os"
+    "log"
     "strings"
     "unicode"
+    "encoding/binary"
     snowballeng "github.com/kljensen/snowball/english"
 )
 
@@ -99,22 +101,33 @@ func (idx index) add(docs []document) {
 }
 
 func (idx index) saveIndex() {
+    f, err := os.Create("index.bin")
+    if err != nil {
+       log.Fatal("Couldn't open file") 
+    }
+    defer f.Close()
 
+    err = binary.Write(f, binary.LittleEndian, idx)
+    if err != nil {
+       log.Fatal("Write failed") 
+    }
 }
 
-func (idx index) loadIndex() {
+func (idx index) loadIndex() (index){
+    //TODO: implement
+    return idx
 
 }
 
 func createInvertedIndexIfNotExists() {
     idx := make(index)
-    if err := loadIndex("./index.json", idx); err != nil {
-        log.Fatalln(err)
+    if err := idx.loadIndex(); err != nil {
+        log.Fatal(err)
     }
     docs, err := loadDocuments(`enwiki-latest-abstract1.xml`)
     if err != nil {
         fmt.Println("Error when loading documents: ", err)
     }
     idx.add(docs)
-    idx.persist()
+    idx.saveIndex()
 }
